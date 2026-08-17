@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sonar — Gaming Service</title>
   <link rel="stylesheet" href="style.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
@@ -18,8 +17,8 @@
     <div class="noise-overlay"></div>
   </div>
 
-  <!-- ===== 3D CANVAS ===== -->
-  <canvas id="three-canvas"></canvas>
+  <!-- ===== 3D CANVAS (Pure JS, no libraries) ===== -->
+  <canvas id="bg-canvas"></canvas>
 
   <!-- ===== CURSOR GLOW ===== -->
   <div class="cursor-glow" id="cursorGlow"></div>
@@ -180,7 +179,7 @@
         <div class="feature-icon fi-4">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         </div>
-        <h3>Voice & Chat</h3>
+        <h3>Voice &amp; Chat</h3>
         <p>Встроенный VoIP с шумоподавлением. Текстовый чат с модерацией AI.</p>
         <div class="feature-tag">Built-in VoIP</div>
       </div>
@@ -291,8 +290,8 @@
 
 <span class="c-com">// Обработка событий</span>
 sonar.<span class="c-fn">on</span>(<span class="c-str">'match_found'</span>, (data) => {
-  console.<span class="c-fn">log</span>(<span class="c-str">`🎮 Match: </span>${data.id}<span class="c-str">`</span>);
-  console.<span class="c-fn">log</span>(<span class="c-str">`👥 Players: </span>${data.players.length}<span class="c-str">`</span>);
+  console.<span class="c-fn">log</span>(<span class="c-str">`Match: </span>${data.id}<span class="c-str">`</span>);
+  console.<span class="c-fn">log</span>(<span class="c-str">`Players: </span>${data.players.length}<span class="c-str">`</span>);
 });
 
 <span class="c-com">// Аналитика</span>
@@ -358,7 +357,7 @@ sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_compl
           <div class="dl-icon">📦</div>
           <h3>SDK Complete</h3>
           <p class="dl-desc">Все модули в одном пакете</p>
-          <div class="dl-version">v4.2.1 • 2.4 MB</div>
+          <div class="dl-version">v4.2.1 &bull; 2.4 MB</div>
           <button class="btn-download" onclick="fakeDownload(this, 'SDK Complete')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             <span>Скачать SDK</span>
@@ -368,7 +367,7 @@ sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_compl
           <div class="dl-icon">⚡</div>
           <h3>CLI Tool</h3>
           <p class="dl-desc">Управление из терминала</p>
-          <div class="dl-version">v2.1.0 • 840 KB</div>
+          <div class="dl-version">v2.1.0 &bull; 840 KB</div>
           <button class="btn-download btn-dl-secondary" onclick="fakeDownload(this, 'CLI Tool')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             <span>Скачать CLI</span>
@@ -378,7 +377,7 @@ sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_compl
           <div class="dl-icon">📖</div>
           <h3>Documentation</h3>
           <p class="dl-desc">Полная документация offline</p>
-          <div class="dl-version">v4.2 • 12 MB</div>
+          <div class="dl-version">v4.2 &bull; 12 MB</div>
           <button class="btn-download btn-dl-secondary" onclick="fakeDownload(this, 'Documentation')">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
             <span>Скачать Docs</span>
@@ -411,7 +410,7 @@ sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_compl
     <div class="footer-inner">
       <div class="footer-logo">
         <span class="logo-text">SONAR</span>
-        <span class="footer-copy">© 2025 Sonar Gaming Infrastructure</span>
+        <span class="footer-copy">&copy; 2025 Sonar Gaming Infrastructure</span>
       </div>
       <div class="footer-links">
         <a href="#">Документация</a>
@@ -425,8 +424,7 @@ sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_compl
   <!-- ===== TOAST ===== -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <!-- Three.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- NO external libraries — everything is self-contained -->
   <script src="script.js"></script>
 </body>
 </html>
