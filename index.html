@@ -1,430 +1,441 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sonar — Gaming Service</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sonar — Play. Upload. Connect.</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-  <!-- ===== ANIMATED BACKGROUND BLOBS ===== -->
-  <div class="bg-layer">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-    <div class="blob blob-4"></div>
-    <div class="noise-overlay"></div>
-  </div>
+  <!-- COSMIC BACKGROUND -->
+  <canvas id="cosmos"></canvas>
+  <div class="vignette"></div>
 
-  <!-- ===== 3D CANVAS (Pure JS, no libraries) ===== -->
-  <canvas id="bg-canvas"></canvas>
+  <!-- CUSTOM CURSOR -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
 
-  <!-- ===== CURSOR GLOW ===== -->
-  <div class="cursor-glow" id="cursorGlow"></div>
-
-  <!-- ===== NAVBAR ===== -->
-  <nav class="navbar glass-nav" id="navbar">
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
     <div class="nav-logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 40 40" fill="none">
-          <circle cx="20" cy="20" r="8" stroke="url(#lg1)" stroke-width="2.5"/>
-          <circle cx="20" cy="20" r="14" stroke="url(#lg1)" stroke-width="1.5" opacity="0.6"/>
-          <circle cx="20" cy="20" r="19" stroke="url(#lg1)" stroke-width="1" opacity="0.3"/>
-          <defs>
-            <linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40">
-              <stop stop-color="#00e5ff"/>
-              <stop offset="1" stop-color="#a855f7"/>
-            </linearGradient>
-          </defs>
-        </svg>
-      </div>
+      <svg class="logo-svg" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="7" stroke="#fff" stroke-width="2"/>
+        <circle cx="20" cy="20" r="13" stroke="#fff" stroke-width="1" opacity=".4"/>
+        <circle cx="20" cy="20" r="18" stroke="#fff" stroke-width=".7" opacity=".2"/>
+        <circle cx="20" cy="20" r="2.5" fill="#fff"/>
+      </svg>
       <span class="logo-text">SONAR</span>
     </div>
     <div class="nav-links">
       <a href="#hero" class="nav-link active">Главная</a>
       <a href="#features" class="nav-link">Возможности</a>
+      <a href="#upload" class="nav-link">Загрузка игр</a>
+      <a href="#catalog" class="nav-link">Каталог</a>
       <a href="#stats" class="nav-link">Статистика</a>
       <a href="#api" class="nav-link">API</a>
       <a href="#download" class="nav-link">Скачать</a>
     </div>
-    <button class="nav-cta glass-btn-small">Войти</button>
+    <button class="nav-btn">Войти</button>
   </nav>
 
-  <!-- ===== SIDE DOTS NAV ===== -->
-  <div class="side-nav" id="sideNav">
-    <div class="side-dot active" data-index="0"><span>01</span></div>
-    <div class="side-dot" data-index="1"><span>02</span></div>
-    <div class="side-dot" data-index="2"><span>03</span></div>
-    <div class="side-dot" data-index="3"><span>04</span></div>
-    <div class="side-dot" data-index="4"><span>05</span></div>
+  <!-- SIDE NAV -->
+  <div class="side-nav">
+    <div class="sdot active" data-i="0"></div>
+    <div class="sdot" data-i="1"></div>
+    <div class="sdot" data-i="2"></div>
+    <div class="sdot" data-i="3"></div>
+    <div class="sdot" data-i="4"></div>
+    <div class="sdot" data-i="5"></div>
+    <div class="sdot" data-i="6"></div>
   </div>
 
-  <!-- ===== SECTION 1: HERO ===== -->
-  <section class="section" id="hero">
-    <div class="hero-content">
-      <div class="hero-badge glass-pill">
-        <span class="badge-dot"></span>
-        20,000,000+ активных пользователей
-      </div>
-      <h1 class="hero-title">
-        <span class="title-line">Игровая</span>
-        <span class="title-line gradient-text">библиотека</span>
-        <span class="title-line">нового поколения</span>
-      </h1>
-      <p class="hero-sub">
-        Sonar — инфраструктурный слой для игровых сервисов.
-        Мгновенная синхронизация, защита от читов, аналитика в реальном времени.
-      </p>
-      <div class="hero-buttons">
-        <button class="btn-primary" onclick="scrollToSection(4)">
-          <span>Начать бесплатно</span>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-        <button class="btn-glass" onclick="scrollToSection(1)">
-          Узнать больше
-        </button>
-      </div>
-      <div class="hero-clients">
-        <span class="clients-label">Нам доверяют:</span>
-        <div class="clients-logos">
-          <div class="client-logo glass-chip">Unity</div>
-          <div class="client-logo glass-chip">Unreal</div>
-          <div class="client-logo glass-chip">Steam</div>
-          <div class="client-logo glass-chip">Epic</div>
+  <!-- ============ PAGE 1: HERO ============ -->
+  <section class="sec" id="hero">
+    <div class="hero-wrap">
+      <div class="hero-left">
+        <div class="badge"><span class="badge-dot"></span> Ранее известны как Stream</div>
+        <h1 class="hero-h1">
+          <span class="line">Играй.</span>
+          <span class="line outline-text">Загружай.</span>
+          <span class="line">Объединяйся.</span>
+        </h1>
+        <p class="hero-p">Sonar — космическая игровая платформа нового поколения. Загружай свои игры, играй с друзьями по всему миру. 20 миллионов игроков уже здесь.</p>
+        <div class="hero-btns">
+          <button class="btn-white" onclick="go(6)">Скачать Sonar</button>
+          <button class="btn-ghost" onclick="go(2)">Загрузить игру</button>
+        </div>
+        <div class="hero-partners">
+          <span class="partners-label">Официальные партнёры:</span>
+          <div class="partner-logos">
+            <span class="p-logo">Steam</span>
+            <span class="p-logo">Rockstar Games</span>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="hero-visual">
-      <div class="glass-card-float card-main">
-        <div class="card-header-row">
-          <div class="card-dots"><i></i><i></i><i></i></div>
-          <span class="card-title-bar">sonar://dashboard</span>
-        </div>
-        <div class="card-body-mock">
-          <div class="mock-row">
-            <div class="mock-stat glass-inner">
-              <span class="mock-num" id="counter1">0</span>
-              <span class="mock-label">Online Now</span>
+      <div class="hero-right">
+        <div class="glass-card hero-card-main">
+          <div class="hc-header"><i class="d d-r"></i><i class="d d-y"></i><i class="d d-g"></i><span class="hc-title">sonar://library</span></div>
+          <div class="hc-body">
+            <div class="hc-stats">
+              <div class="hc-stat"><span class="hc-num" id="hc1">0</span><span class="hc-lbl">Онлайн</span></div>
+              <div class="hc-stat"><span class="hc-num" id="hc2">0</span><span class="hc-lbl">Матчей/сек</span></div>
             </div>
-            <div class="mock-stat glass-inner accent">
-              <span class="mock-num" id="counter2">0</span>
-              <span class="mock-label">Matches/sec</span>
+            <div class="hc-bars">
+              <div class="hbar" style="--h:55%;--d:0s"></div>
+              <div class="hbar" style="--h:80%;--d:.08s"></div>
+              <div class="hbar" style="--h:40%;--d:.16s"></div>
+              <div class="hbar" style="--h:92%;--d:.24s"></div>
+              <div class="hbar" style="--h:65%;--d:.32s"></div>
+              <div class="hbar" style="--h:88%;--d:.4s"></div>
+              <div class="hbar" style="--h:50%;--d:.48s"></div>
+              <div class="hbar" style="--h:75%;--d:.56s"></div>
+            </div>
+            <div class="hc-users">
+              <div class="hc-u"><span class="av av1"></span>cosmic_player<span class="st-on"></span></div>
+              <div class="hc-u"><span class="av av2"></span>nebula_gg<span class="st-on"></span></div>
+              <div class="hc-u"><span class="av av3"></span>dark_matter<span class="st-idle"></span></div>
             </div>
           </div>
-          <div class="mock-graph">
-            <div class="graph-bar" style="--h:60%;--d:0s"></div>
-            <div class="graph-bar" style="--h:80%;--d:.1s"></div>
-            <div class="graph-bar" style="--h:45%;--d:.2s"></div>
-            <div class="graph-bar" style="--h:90%;--d:.3s"></div>
-            <div class="graph-bar" style="--h:70%;--d:.4s"></div>
-            <div class="graph-bar" style="--h:95%;--d:.5s"></div>
-            <div class="graph-bar" style="--h:55%;--d:.6s"></div>
-            <div class="graph-bar" style="--h:85%;--d:.7s"></div>
-          </div>
-          <div class="mock-users">
-            <div class="mock-user"><div class="avatar a1"></div><span>player_x92</span><em class="status-on"></em></div>
-            <div class="mock-user"><div class="avatar a2"></div><span>neo_gamer</span><em class="status-on"></em></div>
-            <div class="mock-user"><div class="avatar a3"></div><span>shadow_k</span><em class="status-idle"></em></div>
-          </div>
         </div>
-      </div>
-      <div class="glass-card-float card-notification">
-        <div class="notif-icon">🎮</div>
-        <div class="notif-text">
-          <strong>Матч найден!</strong>
-          <span>4 игрока • Ранговый режим</span>
+        <div class="glass-card hero-float hf-notif">
+          <span class="hf-icon">🚀</span>
+          <div><strong>Матч найден!</strong><small>4 игрока • Cosmos Arena</small></div>
         </div>
-      </div>
-      <div class="glass-card-float card-badge-float">
-        <span class="float-badge-num">99.9%</span>
-        <span class="float-badge-label">Uptime</span>
+        <div class="glass-card hero-float hf-badge">
+          <span class="hf-big">99.9%</span>
+          <span class="hf-sm">UPTIME</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== SECTION 2: FEATURES ===== -->
-  <section class="section" id="features">
-    <div class="section-header">
-      <span class="section-tag glass-pill">Возможности</span>
-      <h2 class="section-title">Всё что нужно<br><span class="gradient-text">в одном SDK</span></h2>
-      <p class="section-sub">Шесть модулей. Один импорт. Бесконечные возможности.</p>
+  <!-- ============ PAGE 2: FEATURES ============ -->
+  <section class="sec" id="features">
+    <div class="sec-head">
+      <span class="tag">Возможности</span>
+      <h2 class="sec-title">Всё для геймеров<br><span class="outline-text">в одной платформе</span></h2>
+      <p class="sec-sub">Загружай, играй, общайся, соревнуйся. Sonar — твоя вселенная.</p>
     </div>
-    <div class="features-grid">
-      <div class="feature-card glass-card" data-delay="0">
-        <div class="feature-icon fi-1">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <h3>Мгновенный Matchmaking</h3>
-        <p>Алгоритм находит соперников за &lt;200мс. Поддержка до 100 игроков в лобби.</p>
-        <div class="feature-tag">Latency &lt; 200ms</div>
+    <div class="feat-grid">
+      <div class="feat-card glass-card" data-delay="0">
+        <div class="feat-ico fi1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></div>
+        <h3>Загрузка игр</h3>
+        <p>Загружай свои игры на платформу. Поддержка любых форматов. Мгновенная публикация для 20M игроков.</p>
+        <span class="feat-tag">Upload & Play</span>
       </div>
-      <div class="feature-card glass-card" data-delay="1">
-        <div class="feature-icon fi-2">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        </div>
-        <h3>Anti-Cheat Shield</h3>
-        <p>Детекция на уровне ядра. Нейросеть анализирует поведение в реальном времени.</p>
-        <div class="feature-tag">AI-Powered</div>
+      <div class="feat-card glass-card" data-delay="1">
+        <div class="feat-ico fi2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        <h3>Играй мгновенно</h3>
+        <p>Никаких ожиданий. Нажми «Играть» и погружайся. Облачный стриминг для слабых устройств.</p>
+        <span class="feat-tag">Cloud Gaming</span>
       </div>
-      <div class="feature-card glass-card" data-delay="2">
-        <div class="feature-icon fi-3">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <h3>Live Analytics</h3>
-        <p>Дашборды, воронки, retention. Все метрики обновляются каждую секунду.</p>
-        <div class="feature-tag">Real-time</div>
+      <div class="feat-card glass-card" data-delay="2">
+        <div class="feat-ico fi3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+        <h3>Мультиплеер</h3>
+        <p>Играй с друзьями или находи новых. Встроенный матчмейкинг находит соперников за 200мс.</p>
+        <span class="feat-tag">&lt; 200ms</span>
       </div>
-      <div class="feature-card glass-card" data-delay="3">
-        <div class="feature-icon fi-4">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        </div>
-        <h3>Voice &amp; Chat</h3>
-        <p>Встроенный VoIP с шумоподавлением. Текстовый чат с модерацией AI.</p>
-        <div class="feature-tag">Built-in VoIP</div>
+      <div class="feat-card glass-card" data-delay="3">
+        <div class="feat-ico fi4"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <h3>Чат и голос</h3>
+        <p>Встроенный VoIP с шумоподавлением. Текстовый чат, каналы, группы. Всё для команды.</p>
+        <span class="feat-tag">Built-in VoIP</span>
       </div>
-      <div class="feature-card glass-card" data-delay="4">
-        <div class="feature-icon fi-5">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-        </div>
-        <h3>Cloud Saves</h3>
-        <p>Автосинхронизация прогресса между устройствами. Конфликты разрешаются автоматически.</p>
-        <div class="feature-tag">Cross-platform</div>
+      <div class="feat-card glass-card" data-delay="4">
+        <div class="feat-ico fi5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Античит</h3>
+        <p>AI-детекция на уровне ядра. Честная игра для всех. Нейросеть анализирует каждый кадр.</p>
+        <span class="feat-tag">AI Shield</span>
       </div>
-      <div class="feature-card glass-card" data-delay="5">
-        <div class="feature-icon fi-6">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-        </div>
-        <h3>Global CDN</h3>
-        <p>300+ точек присутствия. Контент доставляется из ближайшего дата-центра.</p>
-        <div class="feature-tag">300+ PoPs</div>
+      <div class="feat-card glass-card" data-delay="5">
+        <div class="feat-ico fi6"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <h3>Аналитика</h3>
+        <p>Для разработчиков: дашборды, retention, воронки. Все метрики в реальном времени.</p>
+        <span class="feat-tag">Real-time</span>
       </div>
     </div>
   </section>
 
-  <!-- ===== SECTION 3: STATS ===== -->
-  <section class="section" id="stats">
-    <div class="section-header">
-      <span class="section-tag glass-pill">Цифры</span>
-      <h2 class="section-title">Нам доверяют<br><span class="gradient-text">миллионы</span></h2>
+  <!-- ============ PAGE 3: UPLOAD ============ -->
+  <section class="sec" id="upload">
+    <div class="sec-head">
+      <span class="tag">Для разработчиков</span>
+      <h2 class="sec-title">Загрузи свою игру<br><span class="outline-text">на Sonar</span></h2>
+      <p class="sec-sub">Публикуй игры для 20 миллионов игроков. Бесплатно. Без модерации до 24 часов.</p>
+    </div>
+    <div class="upload-layout">
+      <div class="upload-zone glass-card" id="uploadZone">
+        <div class="uz-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        </div>
+        <h3>Перетащи файл игры сюда</h3>
+        <p>или нажми для выбора файла</p>
+        <span class="uz-formats">.exe .zip .apk .ipa .unitypackage — до 50 GB</span>
+        <div class="uz-fake-input">
+          <input type="file" id="fakeFileInput" disabled/>
+          <button class="btn-white uz-btn" onclick="fakeUpload()">Выбрать файл</button>
+        </div>
+        <div class="uz-progress" id="uzProgress">
+          <div class="uz-bar"><div class="uz-fill" id="uzFill"></div></div>
+          <span class="uz-pct" id="uzPct">0%</span>
+        </div>
+      </div>
+      <div class="upload-steps">
+        <div class="ustep glass-card">
+          <span class="ustep-n">01</span>
+          <div><h4>Подготовь билд</h4><p>Собери игру в любом движке — Unity, Unreal, Godot, собственный.</p></div>
+        </div>
+        <div class="ustep glass-card">
+          <span class="ustep-n">02</span>
+          <div><h4>Загрузи на Sonar</h4><p>Drag & drop или через CLI. Автопроверка на вирусы.</p></div>
+        </div>
+        <div class="ustep glass-card">
+          <span class="ustep-n">03</span>
+          <div><h4>Настрой страницу</h4><p>Скриншоты, описание, теги, системные требования.</p></div>
+        </div>
+        <div class="ustep glass-card">
+          <span class="ustep-n">04</span>
+          <div><h4>Публикуй</h4><p>Игра доступна 20M пользователям мгновенно.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 4: CATALOG ============ -->
+  <section class="sec" id="catalog">
+    <div class="sec-head">
+      <span class="tag">Каталог</span>
+      <h2 class="sec-title">Популярные игры<br><span class="outline-text">на Sonar</span></h2>
+      <p class="sec-sub">Тысячи игр от инди-разработчиков до AAA-студий.</p>
+    </div>
+    <div class="catalog-grid">
+      <div class="game-card glass-card gc-big">
+        <div class="gc-img gc-img1"></div>
+        <div class="gc-info">
+          <span class="gc-genre">Action RPG</span>
+          <h3>Cosmos Odyssey</h3>
+          <p>Исследуй бесконечную вселенную. 200+ часов контента.</p>
+          <div class="gc-meta"><span>⭐ 4.9</span><span>👥 2.4M</span><span class="gc-free">FREE</span></div>
+        </div>
+        <button class="gc-play" onclick="fakePlay('Cosmos Odyssey')">▶ Играть</button>
+      </div>
+      <div class="game-card glass-card">
+        <div class="gc-img gc-img2"></div>
+        <div class="gc-info">
+          <span class="gc-genre">Shooter</span>
+          <h3>Nebula Strike</h3>
+          <div class="gc-meta"><span>⭐ 4.7</span><span>👥 1.8M</span></div>
+        </div>
+        <button class="gc-play" onclick="fakePlay('Nebula Strike')">▶ Играть</button>
+      </div>
+      <div class="game-card glass-card">
+        <div class="gc-img gc-img3"></div>
+        <div class="gc-info">
+          <span class="gc-genre">Strategy</span>
+          <h3>Dark Matter RTS</h3>
+          <div class="gc-meta"><span>⭐ 4.8</span><span>👥 920K</span></div>
+        </div>
+        <button class="gc-play" onclick="fakePlay('Dark Matter RTS')">▶ Играть</button>
+      </div>
+      <div class="game-card glass-card">
+        <div class="gc-img gc-img4"></div>
+        <div class="gc-info">
+          <span class="gc-genre">Racing</span>
+          <h3>Void Racers</h3>
+          <div class="gc-meta"><span>⭐ 4.6</span><span>👥 750K</span></div>
+        </div>
+        <button class="gc-play" onclick="fakePlay('Void Racers')">▶ Играть</button>
+      </div>
+      <div class="game-card glass-card">
+        <div class="gc-img gc-img5"></div>
+        <div class="gc-info">
+          <span class="gc-genre">Horror</span>
+          <h3>Signal Lost</h3>
+          <div class="gc-meta"><span>⭐ 4.5</span><span>👥 610K</span></div>
+        </div>
+        <button class="gc-play" onclick="fakePlay('Signal Lost')">▶ Играть</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PAGE 5: STATS ============ -->
+  <section class="sec" id="stats">
+    <div class="sec-head">
+      <span class="tag">Цифры</span>
+      <h2 class="sec-title">Нам доверяют<br><span class="outline-text">миллионы</span></h2>
     </div>
     <div class="stats-grid">
-      <div class="stat-card glass-card stat-big">
-        <div class="stat-number gradient-text" data-target="20000000" data-suffix="+">0</div>
-        <div class="stat-label">Активных пользователей</div>
-        <div class="stat-bar"><div class="stat-bar-fill"></div></div>
+      <div class="stat-card glass-card stat-hero">
+        <div class="stat-num outline-text" data-target="20000000" data-suffix="+">0</div>
+        <div class="stat-lbl">Активных игроков</div>
+        <div class="stat-bar"><div class="stat-fill"></div></div>
       </div>
-      <div class="stat-card glass-card">
-        <div class="stat-number" data-target="99.9" data-suffix="%" data-decimal="1">0</div>
-        <div class="stat-label">Uptime SLA</div>
-      </div>
-      <div class="stat-card glass-card">
-        <div class="stat-number" data-target="300" data-suffix="+">0</div>
-        <div class="stat-label">Дата-центров</div>
-      </div>
-      <div class="stat-card glass-card">
-        <div class="stat-number" data-target="50" data-suffix="мс">0</div>
-        <div class="stat-label">Средний пинг</div>
-      </div>
-      <div class="stat-card glass-card">
-        <div class="stat-number" data-target="12000" data-suffix="+">0</div>
-        <div class="stat-label">Игр подключено</div>
-      </div>
-      <div class="stat-card glass-card">
-        <div class="stat-number" data-target="24" data-suffix="/7">0</div>
-        <div class="stat-label">Поддержка</div>
-      </div>
+      <div class="stat-card glass-card"><div class="stat-num" data-target="99.9" data-suffix="%" data-decimal="1">0</div><div class="stat-lbl">Uptime</div></div>
+      <div class="stat-card glass-card"><div class="stat-num" data-target="300" data-suffix="+">0</div><div class="stat-lbl">Дата-центров</div></div>
+      <div class="stat-card glass-card"><div class="stat-num" data-target="50" data-suffix="мс">0</div><div class="stat-lbl">Средний пинг</div></div>
+      <div class="stat-card glass-card"><div class="stat-num" data-target="12000" data-suffix="+">0</div><div class="stat-lbl">Игр в каталоге</div></div>
+      <div class="stat-card glass-card"><div class="stat-num" data-target="24" data-suffix="/7">0</div><div class="stat-lbl">Поддержка</div></div>
     </div>
-    <!-- Live ticker -->
-    <div class="live-ticker glass-card">
-      <div class="ticker-dot"></div>
-      <span class="ticker-label">LIVE</span>
-      <div class="ticker-track">
-        <div class="ticker-content" id="tickerContent">
-          <span>🎮 player_4821 подключился из Москвы</span>
-          <span>⚔️ Матч завершён: 4v4 Ranked</span>
-          <span>🏆 neo_gamer достиг Diamond ранга</span>
-          <span>🔒 Anti-cheat заблокировал 3 читера</span>
-          <span>📊 +1,247 новых регистраций за последний час</span>
-          <span>🌐 CDN узел в Токио: latency 12ms</span>
-          <span>🎮 player_4821 подключился из Москвы</span>
-          <span>⚔️ Матч завершён: 4v4 Ranked</span>
-          <span>🏆 neo_gamer достиг Diamond ранга</span>
-          <span>🔒 Anti-cheat заблокировал 3 читера</span>
-        </div>
-      </div>
+    <div class="ticker glass-card">
+      <span class="ticker-dot"></span>
+      <span class="ticker-live">LIVE</span>
+      <div class="ticker-track"><div class="ticker-inner">
+        <span>🚀 cosmic_player запустил Cosmos Odyssey</span>
+        <span>⚔️ Матч завершён: Nebula Strike 4v4</span>
+        <span>📦 Новый билд загружен: Void Racers v2.1</span>
+        <span>🏆 dark_matter достиг Diamond ранга</span>
+        <span>🔒 Античит заблокировал 5 читеров</span>
+        <span>📊 +2,841 регистраций за последний час</span>
+        <span>🚀 cosmic_player запустил Cosmos Odyssey</span>
+        <span>⚔️ Матч завершён: Nebula Strike 4v4</span>
+        <span>📦 Новый билд загружен: Void Racers v2.1</span>
+        <span>🏆 dark_matter достиг Diamond ранга</span>
+      </div></div>
     </div>
   </section>
 
-  <!-- ===== SECTION 4: API / CODE ===== -->
-  <section class="section" id="api">
-    <div class="section-header">
-      <span class="section-tag glass-pill">Для разработчиков</span>
-      <h2 class="section-title">Интеграция<br><span class="gradient-text">за 5 минут</span></h2>
-      <p class="section-sub">Один SDK. Все платформы. Полный контроль.</p>
+  <!-- ============ PAGE 6: API ============ -->
+  <section class="sec" id="api">
+    <div class="sec-head">
+      <span class="tag">API</span>
+      <h2 class="sec-title">Интеграция<br><span class="outline-text">за 5 минут</span></h2>
+      <p class="sec-sub">Один SDK. Все платформы. Полный контроль.</p>
     </div>
     <div class="api-layout">
-      <div class="code-window glass-card">
-        <div class="code-header">
-          <div class="code-dots"><i class="cd-r"></i><i class="cd-y"></i><i class="cd-g"></i></div>
-          <span class="code-filename">integration.js</span>
-          <button class="code-copy" onclick="copyCode(this)">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            Copy
-          </button>
+      <div class="code-win glass-card">
+        <div class="cw-head">
+          <span class="cw-dots"><i class="cd-r"></i><i class="cd-y"></i><i class="cd-g"></i></span>
+          <span class="cw-file">integration.js</span>
+          <button class="cw-copy" onclick="copyCode(this)"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Copy</button>
         </div>
-        <pre class="code-body"><code><span class="c-kw">import</span> { Sonar } <span class="c-kw">from</span> <span class="c-str">'@sonar/sdk'</span>;
+        <pre class="cw-body"><code><span class="ck">import</span> { Sonar } <span class="ck">from</span> <span class="cs">'@sonar/sdk'</span>;
 
-<span class="c-com">// Инициализация за 1 строку</span>
-<span class="c-kw">const</span> sonar = <span class="c-kw">new</span> <span class="c-fn">Sonar</span>({
-  apiKey: <span class="c-str">'your_api_key'</span>,
-  region: <span class="c-str">'eu-west'</span>,
-  antiCheat: <span class="c-kw">true</span>,
+<span class="cc">// Инициализация</span>
+<span class="ck">const</span> sonar = <span class="ck">new</span> <span class="cf">Sonar</span>({
+  apiKey: <span class="cs">'your_key'</span>,
+  region: <span class="cs">'eu-west'</span>,
 });
 
-<span class="c-com">// Поиск матча</span>
-<span class="c-kw">const</span> match = <span class="c-kw">await</span> sonar.matchmaking.<span class="c-fn">find</span>({
-  mode: <span class="c-str">'ranked_4v4'</span>,
-  maxLatency: <span class="c-num">100</span>,
+<span class="cc">// Загрузить игру</span>
+<span class="ck">await</span> sonar.games.<span class="cf">upload</span>({
+  file: buildFile,
+  name: <span class="cs">'My Awesome Game'</span>,
+  genre: <span class="cs">'action'</span>,
 });
 
-<span class="c-com">// Обработка событий</span>
-sonar.<span class="c-fn">on</span>(<span class="c-str">'match_found'</span>, (data) => {
-  console.<span class="c-fn">log</span>(<span class="c-str">`Match: </span>${data.id}<span class="c-str">`</span>);
-  console.<span class="c-fn">log</span>(<span class="c-str">`Players: </span>${data.players.length}<span class="c-str">`</span>);
+<span class="cc">// Найти матч</span>
+<span class="ck">const</span> match = <span class="ck">await</span> sonar.matchmaking.<span class="cf">find</span>({
+  mode: <span class="cs">'ranked_4v4'</span>,
+  maxPing: <span class="cn">100</span>,
 });
 
-<span class="c-com">// Аналитика</span>
-sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_complete'</span>, {
-  level: <span class="c-num">7</span>,
-  time_ms: <span class="c-num">42300</span>,
+sonar.<span class="cf">on</span>(<span class="cs">'match_found'</span>, (d) => {
+  console.<span class="cf">log</span>(<span class="cs">`Match: ${d.id}`</span>);
 });</code></pre>
       </div>
-      <div class="api-info">
-        <div class="api-step glass-card">
-          <div class="step-num">01</div>
-          <div class="step-content">
-            <h4>Установи SDK</h4>
-            <code class="inline-code">npm install @sonar/sdk</code>
-          </div>
-        </div>
-        <div class="api-step glass-card">
-          <div class="step-num">02</div>
-          <div class="step-content">
-            <h4>Получи API ключ</h4>
-            <p>Зарегистрируйся в дашборде и создай проект за 30 секунд.</p>
-          </div>
-        </div>
-        <div class="api-step glass-card">
-          <div class="step-num">03</div>
-          <div class="step-content">
-            <h4>Подключи модули</h4>
-            <p>Matchmaking, Chat, Analytics, Anti-Cheat — включай что нужно.</p>
-          </div>
-        </div>
-        <div class="api-step glass-card">
-          <div class="step-num">04</div>
-          <div class="step-content">
-            <h4>Запусти в продакшн</h4>
-            <p>Масштабируется автоматически. От 0 до 20M пользователей.</p>
-          </div>
-        </div>
-        <div class="platforms-row">
-          <span class="platform-chip glass-chip">JavaScript</span>
-          <span class="platform-chip glass-chip">C#</span>
-          <span class="platform-chip glass-chip">C++</span>
-          <span class="platform-chip glass-chip">Python</span>
-          <span class="platform-chip glass-chip">Go</span>
-          <span class="platform-chip glass-chip">Rust</span>
+      <div class="api-steps">
+        <div class="astep glass-card"><span class="astep-n">01</span><div><h4>Установи SDK</h4><code class="icode">npm install @sonar/sdk</code></div></div>
+        <div class="astep glass-card"><span class="astep-n">02</span><div><h4>Получи ключ</h4><p>Регистрация в дашборде — 30 секунд.</p></div></div>
+        <div class="astep glass-card"><span class="astep-n">03</span><div><h4>Подключи модули</h4><p>Matchmaking, Chat, Upload, Analytics.</p></div></div>
+        <div class="astep glass-card"><span class="astep-n">04</span><div><h4>Запусти</h4><p>От 0 до 20M пользователей автоматически.</p></div></div>
+        <div class="plat-row">
+          <span class="pch">JavaScript</span><span class="pch">C#</span><span class="pch">C++</span><span class="pch">Python</span><span class="pch">Go</span><span class="pch">Rust</span>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== SECTION 5: DOWNLOAD ===== -->
-  <section class="section" id="download">
-    <div class="download-wrapper">
-      <div class="download-glow"></div>
-      <div class="section-header">
-        <span class="section-tag glass-pill">Скачать</span>
-        <h2 class="section-title">Готов начать?<br><span class="gradient-text">Скачай Sonar SDK</span></h2>
-        <p class="section-sub">Бесплатно до 10,000 MAU. Без кредитной карты.</p>
+  <!-- ============ PAGE 7: DOWNLOAD ============ -->
+  <section class="sec" id="download">
+    <div class="dl-wrap">
+      <div class="sec-head">
+        <span class="tag">Скачать</span>
+        <h2 class="sec-title">Готов войти<br><span class="outline-text">во вселенную?</span></h2>
+        <p class="sec-sub">Бесплатно. Без кредитной карты. 20M игроков ждут.</p>
       </div>
-
-      <div class="download-cards">
-        <div class="dl-card glass-card dl-featured">
-          <div class="dl-popular">POPULAR</div>
-          <div class="dl-icon">📦</div>
-          <h3>SDK Complete</h3>
-          <p class="dl-desc">Все модули в одном пакете</p>
-          <div class="dl-version">v4.2.1 &bull; 2.4 MB</div>
-          <button class="btn-download" onclick="fakeDownload(this, 'SDK Complete')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            <span>Скачать SDK</span>
-          </button>
+      <div class="dl-cards">
+        <div class="dl-card glass-card dl-feat">
+          <div class="dl-pop">POPULAR</div>
+          <div class="dl-ico">🖥️</div>
+          <h3>Windows / Mac / Linux</h3>
+          <p class="dl-desc">Десктоп-клиент Sonar</p>
+          <span class="dl-ver">v4.2.1 • 84 MB</span>
+          <button class="btn-dl" onclick="fakeDl(this,'Desktop Client')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Скачать</span></button>
         </div>
         <div class="dl-card glass-card">
-          <div class="dl-icon">⚡</div>
-          <h3>CLI Tool</h3>
-          <p class="dl-desc">Управление из терминала</p>
-          <div class="dl-version">v2.1.0 &bull; 840 KB</div>
-          <button class="btn-download btn-dl-secondary" onclick="fakeDownload(this, 'CLI Tool')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            <span>Скачать CLI</span>
-          </button>
+          <div class="dl-ico">📱</div>
+          <h3>iOS / Android</h3>
+          <p class="dl-desc">Мобильное приложение</p>
+          <span class="dl-ver">v3.8.0 • 62 MB</span>
+          <button class="btn-dl btn-dl-ghost" onclick="fakeDl(this,'Mobile App')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Скачать</span></button>
         </div>
         <div class="dl-card glass-card">
-          <div class="dl-icon">📖</div>
-          <h3>Documentation</h3>
-          <p class="dl-desc">Полная документация offline</p>
-          <div class="dl-version">v4.2 &bull; 12 MB</div>
-          <button class="btn-download btn-dl-secondary" onclick="fakeDownload(this, 'Documentation')">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            <span>Скачать Docs</span>
-          </button>
+          <div class="dl-ico">⚡</div>
+          <h3>SDK для разработчиков</h3>
+          <p class="dl-desc">Интегрируй Sonar в свою игру</p>
+          <span class="dl-ver">v4.2.1 • 2.4 MB</span>
+          <button class="btn-dl btn-dl-ghost" onclick="fakeDl(this,'SDK')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg><span>Скачать</span></button>
         </div>
       </div>
-
-      <!-- Fake form -->
-      <div class="signup-form glass-card">
-        <h3>Или начни через веб-дашборд</h3>
+      <div class="signup glass-card">
+        <h3>Или создай аккаунт через веб</h3>
         <div class="form-row">
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" placeholder="dev@studio.com" class="glass-input" />
-          </div>
-          <div class="form-group">
-            <label>Название студии</label>
-            <input type="text" placeholder="My Game Studio" class="glass-input" />
-          </div>
-          <button class="btn-primary form-submit" onclick="fakeSignup()">
-            Создать аккаунт
-          </button>
+          <div class="fg"><label>Email</label><input type="email" placeholder="player@cosmos.gg" class="ginput"/></div>
+          <div class="fg"><label>Никнейм</label><input type="text" placeholder="cosmic_player" class="ginput"/></div>
+          <button class="btn-white form-btn" onclick="fakeSignup()">Создать</button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== FOOTER ===== -->
-  <footer class="footer glass-nav">
-    <div class="footer-inner">
-      <div class="footer-logo">
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="footer-top">
+      <div class="footer-brand">
         <span class="logo-text">SONAR</span>
-        <span class="footer-copy">&copy; 2025 Sonar Gaming Infrastructure</span>
+        <p class="footer-about">Космическая игровая платформа нового поколения. Играй, загружай, объединяйся.</p>
+        <div class="footer-rebrand">
+          <span class="rebrand-badge">ℹ️ Ранее мы были известны как <strong>Stream</strong></span>
+        </div>
       </div>
-      <div class="footer-links">
-        <a href="#">Документация</a>
-        <a href="#">GitHub</a>
-        <a href="#">Discord</a>
-        <a href="#">Status</a>
+      <div class="footer-cols">
+        <div class="fcol">
+          <h4>Платформа</h4>
+          <a href="#">Каталог игр</a><a href="#">Загрузить игру</a><a href="#">Cloud Gaming</a><a href="#">Sonar SDK</a>
+        </div>
+        <div class="fcol">
+          <h4>Компания</h4>
+          <a href="#">О нас</a><a href="#">Блог</a><a href="#">Карьера</a><a href="#">Пресса</a>
+        </div>
+        <div class="fcol">
+          <h4>Поддержка</h4>
+          <a href="#">Документация</a><a href="#">Статус серверов</a><a href="#">Discord</a><a href="#">GitHub</a>
+        </div>
       </div>
+    </div>
+    <div class="footer-partners">
+      <span class="fp-label">Официальные партнёры:</span>
+      <div class="fp-logos">
+        <div class="fp-logo">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 5.3 3.4 9.8 8.2 11.4l2.5-3.6c-.2-.5-.3-1-.3-1.6 0-2.5 2-4.5 4.5-4.5.5 0 1 .1 1.5.3l2.4-3.4C16.8 5.7 14.6 4 12 4c-4.4 0-8 3.6-8 8 0 1.3.3 2.5.8 3.6l-2 2.9C1.1 16.5 0 14.4 0 12 0 5.4 5.4 0 12 0zm-1.5 17.5l-1.7 2.5c.5.1 1.1.2 1.7.2 1.5 0 2.9-.4 4.1-1.1-.3 0-.5.1-.8.1-1.5 0-2.8-.7-3.3-1.7zm4.3-4.8c-1.7 0-3 1.3-3 3s1.3 3 3 3 3-1.3 3-3-1.4-3-3-3zm0 5c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+          Steam
+        </div>
+        <div class="fp-logo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9.5 8.5 2 9.5l5.5 4.5L5.5 22 12 18l6.5 4-2-8 5.5-4.5-7.5-1z"/></svg>
+          Rockstar Games
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Sonar Interactive. Все права защищены.</span>
+      <span class="footer-rebrand-sm">Ранее известны как Stream™</span>
     </div>
   </footer>
 
-  <!-- ===== TOAST ===== -->
-  <div class="toast-container" id="toastContainer"></div>
+  <!-- TOAST -->
+  <div class="toast-box" id="toastBox"></div>
 
-  <!-- NO external libraries — everything is self-contained -->
   <script src="script.js"></script>
 </body>
 </html>
