@@ -1,313 +1,432 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonar | Next Gen Gaming Service</title>
-    <style>
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --accent: #00f2ff;
-            --text: #ffffff;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
-        
-        body {
-            background: #050505;
-            color: var(--text);
-            overflow-x: hidden;
-        }
-
-        /* 3D Canvas Background */
-        #canvas-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: -1;
-        }
-
-        /* Liquid Glass Effect */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-        }
-
-        section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            position: relative;
-        }
-
-        .content-wrapper {
-            max-width: 800px;
-            width: 100%;
-            padding: 3rem;
-            text-align: center;
-        }
-
-        h1 { font-size: 4rem; margin-bottom: 1rem; letter-spacing: -2px; }
-        h2 { font-size: 2.5rem; margin-bottom: 1.5rem; color: var(--accent); }
-        p { font-size: 1.2rem; line-height: 1.6; opacity: 0.8; margin-bottom: 2rem; }
-        
-        .stats { 
-            display: flex; 
-            gap: 2rem; 
-            justify-content: center; 
-            margin: 2rem 0; 
-            font-weight: bold; 
-            font-size: 1.5rem;
-        }
-
-        /* Fake Download Button */
-        .btn-download {
-            background: var(--accent);
-            color: #000;
-            padding: 1rem 3rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .btn-download:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--accent); }
-        .btn-download:active { transform: scale(0.95); }
-
-        /* Navigation Dots */
-        .nav-dots {
-            position: fixed;
-            right: 2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            z-index: 100;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .dot.active { background: var(--accent); transform: scale(1.3); }
-
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(255, 50, 50, 0.9);
-            backdrop-filter: blur(10px);
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            opacity: 0;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-            pointer-events: none;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-    </style>
-    <!-- Three.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sonar — Gaming Service</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-    <div id="canvas-container"></div>
+  <!-- ===== ANIMATED BACKGROUND BLOBS ===== -->
+  <div class="bg-layer">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="blob blob-4"></div>
+    <div class="noise-overlay"></div>
+  </div>
 
-    <nav class="nav-dots">
-        <div class="dot active" data-target="0"></div>
-        <div class="dot" data-target="1"></div>
-        <div class="dot" data-target="2"></div>
-        <div class="dot" data-target="3"></div>
-        <div class="dot" data-target="4"></div>
-    </nav>
+  <!-- ===== 3D CANVAS ===== -->
+  <canvas id="three-canvas"></canvas>
 
-    <!-- Page 1: Hero -->
-    <section id="sec-0">
-        <div class="glass-panel content-wrapper">
-            <h1>SONAR</h1>
-            <p>Библиотека нового поколения для игровых сервисов.</p>
-            <div class="stats">
-                <span>20M+ Users</span>
-                <span>99.9% Uptime</span>
+  <!-- ===== CURSOR GLOW ===== -->
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar glass-nav" id="navbar">
+    <div class="nav-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="8" stroke="url(#lg1)" stroke-width="2.5"/>
+          <circle cx="20" cy="20" r="14" stroke="url(#lg1)" stroke-width="1.5" opacity="0.6"/>
+          <circle cx="20" cy="20" r="19" stroke="url(#lg1)" stroke-width="1" opacity="0.3"/>
+          <defs>
+            <linearGradient id="lg1" x1="0" y1="0" x2="40" y2="40">
+              <stop stop-color="#00e5ff"/>
+              <stop offset="1" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <span class="logo-text">SONAR</span>
+    </div>
+    <div class="nav-links">
+      <a href="#hero" class="nav-link active">Главная</a>
+      <a href="#features" class="nav-link">Возможности</a>
+      <a href="#stats" class="nav-link">Статистика</a>
+      <a href="#api" class="nav-link">API</a>
+      <a href="#download" class="nav-link">Скачать</a>
+    </div>
+    <button class="nav-cta glass-btn-small">Войти</button>
+  </nav>
+
+  <!-- ===== SIDE DOTS NAV ===== -->
+  <div class="side-nav" id="sideNav">
+    <div class="side-dot active" data-index="0"><span>01</span></div>
+    <div class="side-dot" data-index="1"><span>02</span></div>
+    <div class="side-dot" data-index="2"><span>03</span></div>
+    <div class="side-dot" data-index="3"><span>04</span></div>
+    <div class="side-dot" data-index="4"><span>05</span></div>
+  </div>
+
+  <!-- ===== SECTION 1: HERO ===== -->
+  <section class="section" id="hero">
+    <div class="hero-content">
+      <div class="hero-badge glass-pill">
+        <span class="badge-dot"></span>
+        20,000,000+ активных пользователей
+      </div>
+      <h1 class="hero-title">
+        <span class="title-line">Игровая</span>
+        <span class="title-line gradient-text">библиотека</span>
+        <span class="title-line">нового поколения</span>
+      </h1>
+      <p class="hero-sub">
+        Sonar — инфраструктурный слой для игровых сервисов.
+        Мгновенная синхронизация, защита от читов, аналитика в реальном времени.
+      </p>
+      <div class="hero-buttons">
+        <button class="btn-primary" onclick="scrollToSection(4)">
+          <span>Начать бесплатно</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+        <button class="btn-glass" onclick="scrollToSection(1)">
+          Узнать больше
+        </button>
+      </div>
+      <div class="hero-clients">
+        <span class="clients-label">Нам доверяют:</span>
+        <div class="clients-logos">
+          <div class="client-logo glass-chip">Unity</div>
+          <div class="client-logo glass-chip">Unreal</div>
+          <div class="client-logo glass-chip">Steam</div>
+          <div class="client-logo glass-chip">Epic</div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="glass-card-float card-main">
+        <div class="card-header-row">
+          <div class="card-dots"><i></i><i></i><i></i></div>
+          <span class="card-title-bar">sonar://dashboard</span>
+        </div>
+        <div class="card-body-mock">
+          <div class="mock-row">
+            <div class="mock-stat glass-inner">
+              <span class="mock-num" id="counter1">0</span>
+              <span class="mock-label">Online Now</span>
             </div>
+            <div class="mock-stat glass-inner accent">
+              <span class="mock-num" id="counter2">0</span>
+              <span class="mock-label">Matches/sec</span>
+            </div>
+          </div>
+          <div class="mock-graph">
+            <div class="graph-bar" style="--h:60%;--d:0s"></div>
+            <div class="graph-bar" style="--h:80%;--d:.1s"></div>
+            <div class="graph-bar" style="--h:45%;--d:.2s"></div>
+            <div class="graph-bar" style="--h:90%;--d:.3s"></div>
+            <div class="graph-bar" style="--h:70%;--d:.4s"></div>
+            <div class="graph-bar" style="--h:95%;--d:.5s"></div>
+            <div class="graph-bar" style="--h:55%;--d:.6s"></div>
+            <div class="graph-bar" style="--h:85%;--d:.7s"></div>
+          </div>
+          <div class="mock-users">
+            <div class="mock-user"><div class="avatar a1"></div><span>player_x92</span><em class="status-on"></em></div>
+            <div class="mock-user"><div class="avatar a2"></div><span>neo_gamer</span><em class="status-on"></em></div>
+            <div class="mock-user"><div class="avatar a3"></div><span>shadow_k</span><em class="status-idle"></em></div>
+          </div>
         </div>
-    </section>
-
-    <!-- Page 2: Features -->
-    <section id="sec-1">
-        <div class="glass-panel content-wrapper">
-            <h2>Liquid Architecture</h2>
-            <p>Наш движок адаптируется под нагрузку в реальном времени. Жидкая архитектура позволяет обрабатывать миллионы запросов без задержек.</p>
+      </div>
+      <div class="glass-card-float card-notification">
+        <div class="notif-icon">🎮</div>
+        <div class="notif-text">
+          <strong>Матч найден!</strong>
+          <span>4 игрока • Ранговый режим</span>
         </div>
-    </section>
+      </div>
+      <div class="glass-card-float card-badge-float">
+        <span class="float-badge-num">99.9%</span>
+        <span class="float-badge-label">Uptime</span>
+      </div>
+    </div>
+  </section>
 
-    <!-- Page 3: Integration -->
-    <section id="sec-2">
-        <div class="glass-panel content-wrapper">
-            <h2>API Integration</h2>
-            <p>Подключение занимает менее 5 минут. Полная совместимость с Unity, Unreal Engine и кастомными решениями.</p>
+  <!-- ===== SECTION 2: FEATURES ===== -->
+  <section class="section" id="features">
+    <div class="section-header">
+      <span class="section-tag glass-pill">Возможности</span>
+      <h2 class="section-title">Всё что нужно<br><span class="gradient-text">в одном SDK</span></h2>
+      <p class="section-sub">Шесть модулей. Один импорт. Бесконечные возможности.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card glass-card" data-delay="0">
+        <div class="feature-icon fi-1">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
         </div>
-    </section>
-
-    <!-- Page 4: Security -->
-    <section id="sec-3">
-        <div class="glass-panel content-wrapper">
-            <h2>Anti-Cheat Shield</h2>
-            <p>Встроенная система защиты на уровне ядра. Sonar обеспечивает честную игру для всех 20 миллионов пользователей.</p>
+        <h3>Мгновенный Matchmaking</h3>
+        <p>Алгоритм находит соперников за &lt;200мс. Поддержка до 100 игроков в лобби.</p>
+        <div class="feature-tag">Latency &lt; 200ms</div>
+      </div>
+      <div class="feature-card glass-card" data-delay="1">
+        <div class="feature-icon fi-2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-    </section>
-
-    <!-- Page 5: Download -->
-    <section id="sec-4">
-        <div class="glass-panel content-wrapper">
-            <h2>Get Started</h2>
-            <p>Скачайте SDK и начните интеграцию сегодня.</p>
-            <button class="btn-download" onclick="fakeDownload()">СКАЧАТЬ SONAR SDK v4.2</button>
+        <h3>Anti-Cheat Shield</h3>
+        <p>Детекция на уровне ядра. Нейросеть анализирует поведение в реальном времени.</p>
+        <div class="feature-tag">AI-Powered</div>
+      </div>
+      <div class="feature-card glass-card" data-delay="2">
+        <div class="feature-icon fi-3">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-    </section>
+        <h3>Live Analytics</h3>
+        <p>Дашборды, воронки, retention. Все метрики обновляются каждую секунду.</p>
+        <div class="feature-tag">Real-time</div>
+      </div>
+      <div class="feature-card glass-card" data-delay="3">
+        <div class="feature-icon fi-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h3>Voice & Chat</h3>
+        <p>Встроенный VoIP с шумоподавлением. Текстовый чат с модерацией AI.</p>
+        <div class="feature-tag">Built-in VoIP</div>
+      </div>
+      <div class="feature-card glass-card" data-delay="4">
+        <div class="feature-icon fi-5">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <h3>Cloud Saves</h3>
+        <p>Автосинхронизация прогресса между устройствами. Конфликты разрешаются автоматически.</p>
+        <div class="feature-tag">Cross-platform</div>
+      </div>
+      <div class="feature-card glass-card" data-delay="5">
+        <div class="feature-icon fi-6">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        </div>
+        <h3>Global CDN</h3>
+        <p>300+ точек присутствия. Контент доставляется из ближайшего дата-центра.</p>
+        <div class="feature-tag">300+ PoPs</div>
+      </div>
+    </div>
+  </section>
 
-    <div class="toast" id="toast">⚠️ Ошибка сервера: Доступ к бинарным файлам временно ограничен</div>
+  <!-- ===== SECTION 3: STATS ===== -->
+  <section class="section" id="stats">
+    <div class="section-header">
+      <span class="section-tag glass-pill">Цифры</span>
+      <h2 class="section-title">Нам доверяют<br><span class="gradient-text">миллионы</span></h2>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card glass-card stat-big">
+        <div class="stat-number gradient-text" data-target="20000000" data-suffix="+">0</div>
+        <div class="stat-label">Активных пользователей</div>
+        <div class="stat-bar"><div class="stat-bar-fill"></div></div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-number" data-target="99.9" data-suffix="%" data-decimal="1">0</div>
+        <div class="stat-label">Uptime SLA</div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-number" data-target="300" data-suffix="+">0</div>
+        <div class="stat-label">Дата-центров</div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-number" data-target="50" data-suffix="мс">0</div>
+        <div class="stat-label">Средний пинг</div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-number" data-target="12000" data-suffix="+">0</div>
+        <div class="stat-label">Игр подключено</div>
+      </div>
+      <div class="stat-card glass-card">
+        <div class="stat-number" data-target="24" data-suffix="/7">0</div>
+        <div class="stat-label">Поддержка</div>
+      </div>
+    </div>
+    <!-- Live ticker -->
+    <div class="live-ticker glass-card">
+      <div class="ticker-dot"></div>
+      <span class="ticker-label">LIVE</span>
+      <div class="ticker-track">
+        <div class="ticker-content" id="tickerContent">
+          <span>🎮 player_4821 подключился из Москвы</span>
+          <span>⚔️ Матч завершён: 4v4 Ranked</span>
+          <span>🏆 neo_gamer достиг Diamond ранга</span>
+          <span>🔒 Anti-cheat заблокировал 3 читера</span>
+          <span>📊 +1,247 новых регистраций за последний час</span>
+          <span>🌐 CDN узел в Токио: latency 12ms</span>
+          <span>🎮 player_4821 подключился из Москвы</span>
+          <span>⚔️ Матч завершён: 4v4 Ranked</span>
+          <span>🏆 neo_gamer достиг Diamond ранга</span>
+          <span>🔒 Anti-cheat заблокировал 3 читера</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <script>
-        // --- 1. THREE.JS LIQUID BACKGROUND ---
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.getElementById('canvas-container').appendChild(renderer.domElement);
+  <!-- ===== SECTION 4: API / CODE ===== -->
+  <section class="section" id="api">
+    <div class="section-header">
+      <span class="section-tag glass-pill">Для разработчиков</span>
+      <h2 class="section-title">Интеграция<br><span class="gradient-text">за 5 минут</span></h2>
+      <p class="section-sub">Один SDK. Все платформы. Полный контроль.</p>
+    </div>
+    <div class="api-layout">
+      <div class="code-window glass-card">
+        <div class="code-header">
+          <div class="code-dots"><i class="cd-r"></i><i class="cd-y"></i><i class="cd-g"></i></div>
+          <span class="code-filename">integration.js</span>
+          <button class="code-copy" onclick="copyCode(this)">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre class="code-body"><code><span class="c-kw">import</span> { Sonar } <span class="c-kw">from</span> <span class="c-str">'@sonar/sdk'</span>;
 
-        // Создание "жидкой" геометрии
-        const geometry = new THREE.IcosahedronGeometry(10, 4);
-        const material = new THREE.MeshPhysicalMaterial({
-            color: 0x00f2ff,
-            metalness: 0.1,
-            roughness: 0.1,
-            transmission: 0.6, // Эффект стекла
-            thickness: 2,
-            wireframe: false,
-            flatShading: false,
-        });
-        
-        const sphere = new THREE.Mesh(geometry, material);
-        scene.add(sphere);
+<span class="c-com">// Инициализация за 1 строку</span>
+<span class="c-kw">const</span> sonar = <span class="c-kw">new</span> <span class="c-fn">Sonar</span>({
+  apiKey: <span class="c-str">'your_api_key'</span>,
+  region: <span class="c-str">'eu-west'</span>,
+  antiCheat: <span class="c-kw">true</span>,
+});
 
-        // Свет
-        const light1 = new THREE.PointLight(0x00f2ff, 2, 50);
-        light1.position.set(10, 10, 10);
-        scene.add(light1);
-        const light2 = new THREE.PointLight(0xff00aa, 2, 50);
-        light2.position.set(-10, -10, 5);
-        scene.add(light2);
-        scene.add(new THREE.AmbientLight(0x404040));
+<span class="c-com">// Поиск матча</span>
+<span class="c-kw">const</span> match = <span class="c-kw">await</span> sonar.matchmaking.<span class="c-fn">find</span>({
+  mode: <span class="c-str">'ranked_4v4'</span>,
+  maxLatency: <span class="c-num">100</span>,
+});
 
-        camera.position.z = 25;
+<span class="c-com">// Обработка событий</span>
+sonar.<span class="c-fn">on</span>(<span class="c-str">'match_found'</span>, (data) => {
+  console.<span class="c-fn">log</span>(<span class="c-str">`🎮 Match: </span>${data.id}<span class="c-str">`</span>);
+  console.<span class="c-fn">log</span>(<span class="c-str">`👥 Players: </span>${data.players.length}<span class="c-str">`</span>);
+});
 
-        // Анимация вершин для эффекта жидкости
-        const originalPositions = geometry.attributes.position.array.slice();
-        
-        function animate() {
-            requestAnimationFrame(animate);
-            
-            const time = Date.now() * 0.001;
-            const positions = geometry.attributes.position.array;
-            
-            for(let i = 0; i < positions.length; i += 3) {
-                const x = originalPositions[i];
-                const y = originalPositions[i+1];
-                const z = originalPositions[i+2];
-                
-                // Простая синусоидальная деформация
-                const offset = Math.sin(x * 0.5 + time) * 0.5 + 
-                               Math.cos(y * 0.5 + time) * 0.5;
-                
-                positions[i] = x + (x / 10) * offset;
-                positions[i+1] = y + (y / 10) * offset;
-                positions[i+2] = z + (z / 10) * offset;
-            }
-            
-            geometry.attributes.position.needsUpdate = true;
-            geometry.computeVertexNormals();
-            
-            sphere.rotation.y += 0.002;
-            sphere.rotation.x += 0.001;
-            
-            renderer.render(scene, camera);
-        }
-        animate();
+<span class="c-com">// Аналитика</span>
+sonar.analytics.<span class="c-fn">track</span>(<span class="c-str">'level_complete'</span>, {
+  level: <span class="c-num">7</span>,
+  time_ms: <span class="c-num">42300</span>,
+});</code></pre>
+      </div>
+      <div class="api-info">
+        <div class="api-step glass-card">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>Установи SDK</h4>
+            <code class="inline-code">npm install @sonar/sdk</code>
+          </div>
+        </div>
+        <div class="api-step glass-card">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>Получи API ключ</h4>
+            <p>Зарегистрируйся в дашборде и создай проект за 30 секунд.</p>
+          </div>
+        </div>
+        <div class="api-step glass-card">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>Подключи модули</h4>
+            <p>Matchmaking, Chat, Analytics, Anti-Cheat — включай что нужно.</p>
+          </div>
+        </div>
+        <div class="api-step glass-card">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>Запусти в продакшн</h4>
+            <p>Масштабируется автоматически. От 0 до 20M пользователей.</p>
+          </div>
+        </div>
+        <div class="platforms-row">
+          <span class="platform-chip glass-chip">JavaScript</span>
+          <span class="platform-chip glass-chip">C#</span>
+          <span class="platform-chip glass-chip">C++</span>
+          <span class="platform-chip glass-chip">Python</span>
+          <span class="platform-chip glass-chip">Go</span>
+          <span class="platform-chip glass-chip">Rust</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Ресайз
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+  <!-- ===== SECTION 5: DOWNLOAD ===== -->
+  <section class="section" id="download">
+    <div class="download-wrapper">
+      <div class="download-glow"></div>
+      <div class="section-header">
+        <span class="section-tag glass-pill">Скачать</span>
+        <h2 class="section-title">Готов начать?<br><span class="gradient-text">Скачай Sonar SDK</span></h2>
+        <p class="section-sub">Бесплатно до 10,000 MAU. Без кредитной карты.</p>
+      </div>
 
-        // --- 2. SCROLL & NAVIGATION LOGIC ---
-        const sections = document.querySelectorAll('section');
-        const dots = document.querySelectorAll('.dot');
+      <div class="download-cards">
+        <div class="dl-card glass-card dl-featured">
+          <div class="dl-popular">POPULAR</div>
+          <div class="dl-icon">📦</div>
+          <h3>SDK Complete</h3>
+          <p class="dl-desc">Все модули в одном пакете</p>
+          <div class="dl-version">v4.2.1 • 2.4 MB</div>
+          <button class="btn-download" onclick="fakeDownload(this, 'SDK Complete')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Скачать SDK</span>
+          </button>
+        </div>
+        <div class="dl-card glass-card">
+          <div class="dl-icon">⚡</div>
+          <h3>CLI Tool</h3>
+          <p class="dl-desc">Управление из терминала</p>
+          <div class="dl-version">v2.1.0 • 840 KB</div>
+          <button class="btn-download btn-dl-secondary" onclick="fakeDownload(this, 'CLI Tool')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Скачать CLI</span>
+          </button>
+        </div>
+        <div class="dl-card glass-card">
+          <div class="dl-icon">📖</div>
+          <h3>Documentation</h3>
+          <p class="dl-desc">Полная документация offline</p>
+          <div class="dl-version">v4.2 • 12 MB</div>
+          <button class="btn-download btn-dl-secondary" onclick="fakeDownload(this, 'Documentation')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            <span>Скачать Docs</span>
+          </button>
+        </div>
+      </div>
 
-        // Плавный скролл по точкам
-        dots.forEach(dot => {
-            dot.addEventListener('click', (e) => {
-                const idx = e.target.dataset.target;
-                sections[idx].scrollIntoView({ behavior: 'smooth' });
-            });
-        });
+      <!-- Fake form -->
+      <div class="signup-form glass-card">
+        <h3>Или начни через веб-дашборд</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" placeholder="dev@studio.com" class="glass-input" />
+          </div>
+          <div class="form-group">
+            <label>Название студии</label>
+            <input type="text" placeholder="My Game Studio" class="glass-input" />
+          </div>
+          <button class="btn-primary form-submit" onclick="fakeSignup()">
+            Создать аккаунт
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        // Подсветка активной точки при скролле
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) {
-                    const id = entry.target.id;
-                    const idx = id.split('-')[1];
-                    dots.forEach(d => d.classList.remove('active'));
-                    document.querySelector(`.dot[data-target="${idx}"]`).classList.add('active');
-                }
-            });
-        }, { threshold: 0.5 });
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer glass-nav">
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <span class="logo-text">SONAR</span>
+        <span class="footer-copy">© 2025 Sonar Gaming Infrastructure</span>
+      </div>
+      <div class="footer-links">
+        <a href="#">Документация</a>
+        <a href="#">GitHub</a>
+        <a href="#">Discord</a>
+        <a href="#">Status</a>
+      </div>
+    </div>
+  </footer>
 
-        sections.forEach(sec => observer.observe(sec));
+  <!-- ===== TOAST ===== -->
+  <div class="toast-container" id="toastContainer"></div>
 
-        // --- 3. FAKE DOWNLOAD LOGIC ---
-        function fakeDownload() {
-            const btn = document.querySelector('.btn-download');
-            const originalText = btn.innerText;
-            
-            btn.innerText = "ЗАГРУЗКА...";
-            btn.style.opacity = "0.7";
-            
-            setTimeout(() => {
-                btn.innerText = originalText;
-                btn.style.opacity = "1";
-                
-                const toast = document.getElementById('toast');
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            }, 1500);
-        }
-    </script>
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
